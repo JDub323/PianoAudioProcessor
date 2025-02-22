@@ -11,6 +11,8 @@
 #include <fftw3.h>
 
 #define AMPLIFY_HIGH_FREQUENCIES false
+//here loudness is defined as the riemann sum of all of the
+#define CONSTANT_LOUDNESS_OVER_TIME false
 
 typedef struct {
     double* in;
@@ -46,7 +48,8 @@ public:
     static void saveSpectroData();
 
     static double getMagnitudeAt(int index);
-    static uint8_t shortenDoubleToByte(double in);
+    static uint8_t shortenDoubleToByte(double in); //I am considering making this into a short, doubling the precision to a 16 bit standard
+
 
 };
 

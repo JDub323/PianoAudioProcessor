@@ -47,7 +47,12 @@ public:
     static void connectToMic();
     static void startRecording(PaCallbackFunction* callbackFunction, void *userData);
     static void pauseRecording();
-    static void quitAndDeallocate();
+    static void micQuitAndDeallocate();
+
+    static void connectToSpeaker();//TODO, likely need image file as input to get inverse fft ready
+    static void startPlaying();//TODO
+    static void pausePlaying();//TODO
+    static void speakerQuitAndDeallocate();//TODO
 };
 
 

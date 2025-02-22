@@ -83,7 +83,7 @@ void AudioFinder::pauseRecording() {
 
 //Closes the PaStream and deallocates the portaudio memory. Should be called after pauseRecording, probably.
 //Does not deallocate spectrogramData, this is done by calling SpectroHandler::deallocateSpectrogramData()
-void AudioFinder::quitAndDeallocate() {
+void AudioFinder::micQuitAndDeallocate() {
     PaError err = Pa_CloseStream(stream);
     checkErr(err);
 

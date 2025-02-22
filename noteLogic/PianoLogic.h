@@ -9,14 +9,19 @@
 #define PIANOLOGIC_H
 #include <cstdint>
 #include <string>
+#include <vector>
 
 class PianoLogic {
 public:
+    static std::string topFivePeaksString(float* arr, int size);//TODO
     static std::string calcKeyString(int pianoKey);
-    static float riemannSum(float* arr, int size);
+    //takes the riemann sum and normalizes the result on a standard scale.
+    static float getVolume(float* arr, int size);//TODO
 
 private:
-
+    //sums all values in the array. To be used by get
+    static float riemannSum(float* arr, int size);//TODO
+    static int getPianoIndexClosestTo(int frequency);//TODO
 };
 
 

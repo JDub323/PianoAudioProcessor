@@ -28,6 +28,7 @@ public:
     static PaCallbackFunction basicPianoDomainAmplitudeDisplay;
     static PaCallbackFunction noDisplay;
     static PaCallbackFunction noDisplaySaveMagnitudeHistory;
+    static PaCallbackFunction noDisplayPlayQueuedAudio;//TODO
 };
 
 

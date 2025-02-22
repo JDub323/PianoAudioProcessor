@@ -32,7 +32,7 @@ void terminalDisplayTest(const PaCallbackFunction function) {
 
     AudioFinder::pauseRecording();
 
-    AudioFinder::quitAndDeallocate();
+    AudioFinder::micQuitAndDeallocate();
 
     SpectroHandler::deallocateSpectrogramData();
 }
@@ -83,7 +83,7 @@ void spectroImageFileTest(const bool saveOnlyPianoKeys) {
 
     AudioFinder::pauseRecording();
 
-    AudioFinder::quitAndDeallocate();
+    AudioFinder::micQuitAndDeallocate();
 
     SpectroHandler::deallocateSpectrogramData();
 
