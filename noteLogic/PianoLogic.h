@@ -1,0 +1,77 @@
+//
+// Created by jwhal on 11/19/2024.
+//
+
+//This class handles piano logic, using algorithms to give the correct
+
+//piano keys are 0 indexed, little endian, so a0 = 0, a0# = 1, ... ,  b7 = 86, c8 = 87
+#ifndef PIANOLOGIC_H
+#define PIANOLOGIC_H
+#include <cstdint>
+#include <string>
+
+class PianoLogic {
+public:
+    static std::string calcKeyString(int pianoKey);
+    static float riemannSum(float* arr, int size);
+
+private:
+
+};
+
+
+
+#endif //PIANOLOGIC_H
+
+
+/*
+ * TODO:
+ *
+ *      standardize piano note history array:
+ *          bool array with 1 where a note was played
+ *          amplitude of each note at time t
+ *          linked list of notes each with start, end, dynamic
+ *          array of notes, history for each note  <<----- CHOOSING THIS ONE AS OF NOW
+ *
+ *          **I believe I should have some dynamically allocated vector which gives a
+ *
+ *      real-time peak finder
+ *
+ *      freq-time-amplitude array --> .wav data (reverse fft)
+ *      .wav data played on speakers through portaudio
+ *
+ *      piano music synthesizer
+ *          consider using some standard format for digital music found online
+ *          or add an individual note manually in some class, go to frequency space, then reverse fft
+ *          STEPS:
+ *              1 standard note type
+ *              2 saved data on note deprecation
+ *                    use a real-time Riemann sum to gauge how notes lose volume then write a
+ *                    scaling factor that normalizes a pgm image for volume to see if frequency
+ *                    distribution changes as the volume diminishes
+ *
+ *              3 saved data on frequency changes with changes in dynamics
+ *                    consider finding an equation to calculate this, but having it precalculated could be faster (chess programming lessons)
+ *
+ *              4 standard note builder (notes --> frequency-time-amplitude array (or array that varies by the tickValue))
+ *                    For this I would need a getFreqDistribution(int tickValue) method for a note class (OOP incoming)
+ *                          this method would use a history of being pressed at some hardness custom for that note and
+ *                          the history of being raised for that same note, and returns how loud it should be at that note
+ *
+ *          DO NEXT 2 EARLIER
+*              5 freq-time-amplitude array --> .wav data (reverse fft)
+*
+ *             6 .wav data played on speakers through portaudio
+ *
+ *
+ */
+
+//what is interesting to think about is how the frequency vector changes depending on dynamics and time since depression
+//I think it is just a vector in 3-space...? I need to study that space to understand if there are any shortcuts
+//I can take
+
+//It is similar to the pgm image 3-space vector
+
+//NVM I FORGOT ABOUT AMPLITUDE, it is a colored function in 3 space
+
+//it could also be thought of as a transformation going from R2 --> R927 (or whatever the spectro width is). Is it linear??
