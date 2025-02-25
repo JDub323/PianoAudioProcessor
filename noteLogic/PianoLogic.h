@@ -13,15 +13,15 @@
 
 class PianoLogic {
 public:
-    static std::string topFivePeaksString(float* arr, int size);//TODO
+    static std::string topFivePeaksString(const float* arr, int size);
     static std::string calcKeyString(int pianoKey);
     //takes the riemann sum and normalizes the result on a standard scale.
     static float getVolume(float* arr, int size);//TODO
 
 private:
-    //sums all values in the array. To be used by get
+    //sums all values in the array. To be used by getVolume
     static float riemannSum(float* arr, int size);//TODO
-    static int getPianoIndexClosestTo(int frequency);//TODO
+    static int getPianoIndexClosestTo(int frequency);
 };
 
 

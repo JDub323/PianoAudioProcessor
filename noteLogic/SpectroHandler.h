@@ -50,7 +50,8 @@ public:
     static double getMagnitudeAt(int index);
     static uint8_t shortenDoubleToByte(double in); //I am considering making this into a short, doubling the precision to a 16 bit standard
 
-
+    static double convertToFrequency(int index);
+    static int convertToSpectroIndex(float frequency);
 };
 
 

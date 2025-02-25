@@ -98,13 +98,14 @@ void spectroImageFileTest(const bool saveOnlyPianoKeys) {
 void bucketCrossoverTest() {
     double currentFrequency = 27.5;
     const double twelfthRootTwo = std::pow(2.0,1.0/12.0);
-    constexpr double frequencyResolution = 8400.0/(FRAMES_PER_BUFFER);
+    constexpr double frequencyResolution = static_cast<float>(MAX_INTERESTING_FREQUENCY) / FRAMES_PER_BUFFER;
 
     auto red = "\033[31m";
     auto white = "\033[37m";
 
     int previousFrequencyIndex = -1;
     int numCollisions = 0;
+
     for (int i = 0; i < 88; i++) {
         const int frequencyIndex = static_cast<int>(currentFrequency / frequencyResolution);
 
@@ -212,14 +213,26 @@ void printSpectroSizes() {
     printf("height: %d\n", SpectroHandler::TOTAL_SAMPLES / SpectroHandler::SPECTROGRAM_SIZE);
 }
 
+void testSpectroConversions() {//this works except the spectro size is not necessarily what is input into the fft is
+    for (int i = 0; i < SpectroHandler::SPECTROGRAM_SIZE; i++) {
+        const double freq = SpectroHandler::convertToFrequency(i);
+        const int identity = SpectroHandler::convertToSpectroIndex(static_cast<float>(freq));
+        printf("Bucket %d: %3d | ", i, identity);
+        printf("%lf\n", freq);
+
+        if (i != identity) printf("***********\n");
+    }
+}
+
 int main() {
     //printAllMicOptions();
     //terminalDisplayTest(CallbackFunctions::basicPianoDomainAmplitudeDisplay);
     //bucketCrossoverTest();
-    //spectroImageFileTest(false);
+    spectroImageFileTest(false);
     //testFileMaker();
-    printSpectroSizes();
+    //printSpectroSizes();
     //testSpectroSaver(false);
+
 
     return EXIT_SUCCESS;
 }

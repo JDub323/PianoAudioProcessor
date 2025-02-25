@@ -136,3 +136,10 @@ uint8_t SpectroHandler::shortenDoubleToByte(const double in) {
     return static_cast<uint8_t>(std::min(255.,in * 255));
 }
 
+double SpectroHandler::convertToFrequency(const int index) {
+    return index * SAMPLE_RATE / FRAMES_PER_BUFFER;
+}
+
+int SpectroHandler::convertToSpectroIndex(const float frequency) {
+    return static_cast<int>(frequency * FRAMES_PER_BUFFER / SAMPLE_RATE);
+}
