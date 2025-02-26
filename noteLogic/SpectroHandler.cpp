@@ -37,7 +37,7 @@ void SpectroHandler::initializeSpectrogramData() {
     spectrogramData = static_cast<streamCallbackData *>(malloc(sizeof(streamCallbackData)));
 
     //only the left channel is used
-    spectrogramData->in = static_cast<double *>(fftw_malloc( sizeof(fftw_complex) * FRAMES_PER_BUFFER));//TODO: check if this is twice as much memory as necessary
+    spectrogramData->in = static_cast<double *>(fftw_malloc( sizeof(double) * FRAMES_PER_BUFFER));
     spectrogramData->out = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) * FRAMES_PER_BUFFER));
     if (spectrogramData->in == nullptr || spectrogramData->out == nullptr) {
         printf("Could not allocate spectrogram data\n");

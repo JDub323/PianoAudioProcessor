@@ -8,6 +8,7 @@
 #include <portaudio.h>
 #include <imgui.h>
 #include <string>
+#include <conio.h>  // for _kbhit() and _getch()
 #include "../myAudio/AudioFinder.h"
 #include "../myAudio/CallbackFunctions.h"
 #include "../noteLogic/SpectroHandler.h"
@@ -16,7 +17,7 @@
 #include "../noteLogic/PianoLogic.h"
 
 //displays fft to terminal based on the parameter PaCallbackFunction
-void terminalDisplayTest(const PaCallbackFunction function) {
+void setTimeTerminalDisplayTest(const PaCallbackFunction function) {
     //allows half-block characters to be written in terminal
     SetConsoleOutputCP(CP_UTF8);
 
@@ -29,6 +30,36 @@ void terminalDisplayTest(const PaCallbackFunction function) {
     AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
 
     Pa_Sleep(RECORDING_TIME * 1000);
+
+    AudioFinder::pauseRecording();
+
+    AudioFinder::micQuitAndDeallocate();
+
+    SpectroHandler::deallocateSpectrogramData();
+}
+
+void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
+    //allows half-block characters to be written in terminal
+    SetConsoleOutputCP(CP_UTF8);
+
+    AudioFinder::connectToMic();
+
+    //initialize global variable spectrogramData
+    SpectroHandler::initializeSpectrogramData();
+
+    Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
+
+    AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
+
+    //yes chatGPT wrote this loop, sue me
+    while (true) {
+        if (_kbhit()) {  // Check if a key was pressed
+            if (_getch() == '\r') {  // Check if it was Enter
+                break;
+            }
+        }
+        Pa_Sleep(100); // Sleep to prevent high CPU usage
+    }
 
     AudioFinder::pauseRecording();
 
@@ -226,8 +257,8 @@ void testSpectroConversions() {//this works except the spectro size is not neces
 
 int main() {
     //printAllMicOptions();
-    //terminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
-    //terminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
+    variableTimeTerminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
+    //setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
     //bucketCrossoverTest();
     //spectroImageFileTest(false);
     //testFileMaker();

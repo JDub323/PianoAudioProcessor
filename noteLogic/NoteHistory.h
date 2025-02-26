@@ -12,10 +12,10 @@
 //use + to denote increase in frequency (pressing key), negative to denote decrease in frequency (the damper touching the string)
 typedef struct {
     int tick;       //can be on or off
-    float volume;//MAY CHANGE DATA TYPE TODO
+    float volume;   //meaning this is really the change in volume
 } keyStroke;
 
-//stores the
+//stores the last two keyStrokes
 typedef struct {
     keyStroke onStroke;
     keyStroke offStroke;
@@ -35,7 +35,7 @@ public:
     //returns whether a note is actually on. Checks the history, including the second from the top.
     //consider making a minimum value for a key to be turned on; otherwise, risk saying a key is on
     //when floating point errors may cause the on - off of a note to be slightly positive
-    bool isOn(int key);
+    bool isOn(int key, int timeTick);
 
     //returns the most recent on press and off press of a key. To be used by the Piano Logic class with NoteData to
     //return a frequency at a point in time

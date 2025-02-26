@@ -44,7 +44,10 @@ std::string PianoLogic::calcKeyString(const int pianoKey) {
     const int octave = (pianoKey + 9) / 12;
     const int noteIndex = pianoKey % 12;
 
-    return notes[noteIndex] + std::to_string(octave);
+    std::string ret = notes[noteIndex] + std::to_string(octave);
+    if (ret.size() == 2) ret += ' ';
+
+    return ret;
 }
 
 double PianoLogic::getVolume(const double *arr, const int size) {

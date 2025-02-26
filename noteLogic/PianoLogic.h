@@ -44,13 +44,11 @@ private:
  *          amplitude of each note at time t
  *          linked list of notes each with start, end, dynamic
  *          array of notes, history for each note  <<----- CHOOSING THIS ONE AS OF NOW
+ *              *actually is implemented as an array of stacks of noteData (a struct)
  *
- *          **I believe I should have some dynamically allocated vector which gives a
  *
- *      real-time peak finder
+ *      real-time peak finder DONE
  *
- *      freq-time-amplitude array --> .wav data (reverse fft)
- *      .wav data played on speakers through portaudio
  *
  *      piano music synthesizer
  *          consider using some standard format for digital music found online
