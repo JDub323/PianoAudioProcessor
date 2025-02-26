@@ -13,15 +13,22 @@
 
 class PianoLogic {
 public:
-    static std::string topFivePeaksString(const float* arr, int size);
+    static std::string topFivePeaksString(const double* arr, int size, int searchStartIndex);
     static std::string calcKeyString(int pianoKey);
     //takes the riemann sum and normalizes the result on a standard scale.
-    static float getVolume(float* arr, int size);//TODO
+    //normalizes the result (finds the average value instead of the sum of frequencies)
+    //note that the getMagnitudeAt function of SpectroHandler also normalizes the sum, which
+    //is not default behavior for fftw3
+    static double getVolume(const double* arr, int size);
+
+    static void testPianoIndexFinder();
 
 private:
     //sums all values in the array. To be used by getVolume
-    static float riemannSum(float* arr, int size);//TODO
-    static int getPianoIndexClosestTo(int frequency);
+    //be careful when using this to give a pointer to the first value which you want summed and the length of the
+    //array you want summed
+    static double riemannSum(const double* arr, int size);
+    static int getPianoIndexClosestTo(double frequency);
 };
 
 

@@ -26,6 +26,7 @@ class CallbackFunctions {
 public:
     static PaCallbackFunction frequencyDomainAmplitudeDisplay;
     static PaCallbackFunction basicPianoDomainAmplitudeDisplay;
+    static PaCallbackFunction displayTopFiveDetectedNotes;
     static PaCallbackFunction noDisplay;
     static PaCallbackFunction noDisplaySaveMagnitudeHistory;
     static PaCallbackFunction noDisplayPlayQueuedAudio;//TODO

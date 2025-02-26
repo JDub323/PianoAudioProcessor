@@ -214,7 +214,7 @@ void printSpectroSizes() {
 }
 
 void testSpectroConversions() {//this works except the spectro size is not necessarily what is input into the fft is
-    for (int i = 0; i < SpectroHandler::SPECTROGRAM_SIZE; i++) {
+    for (int i = std::ceil(FRAMES_PER_BUFFER * START_FREQUENCY / SAMPLE_RATE); i < SpectroHandler::SPECTROGRAM_SIZE; i++) {
         const double freq = SpectroHandler::convertToFrequency(i);
         const int identity = SpectroHandler::convertToSpectroIndex(static_cast<float>(freq));
         printf("Bucket %d: %3d | ", i, identity);
@@ -226,9 +226,10 @@ void testSpectroConversions() {//this works except the spectro size is not neces
 
 int main() {
     //printAllMicOptions();
-    //terminalDisplayTest(CallbackFunctions::basicPianoDomainAmplitudeDisplay);
+    //terminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
+    //terminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
     //bucketCrossoverTest();
-    spectroImageFileTest(false);
+    //spectroImageFileTest(false);
     //testFileMaker();
     //printSpectroSizes();
     //testSpectroSaver(false);

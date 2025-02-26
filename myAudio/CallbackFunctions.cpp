@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "AudioFinder.h"
+#include "../noteLogic/PianoLogic.h"
 #include "../noteLogic/SpectroHandler.h"
 
 
@@ -127,6 +128,41 @@ int CallbackFunctions::basicPianoDomainAmplitudeDisplay(const void *inputBuffer,
 
     return 0;
 }
+
+int CallbackFunctions::displayTopFiveDetectedNotes(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
+    auto* in = (float*) inputBuffer;
+    (void)outputBuffer;
+    auto* callbackData = static_cast<streamCallbackData *>(userData);
+
+    for (unsigned long i = 0; i < framesPerBuffer; i++) {
+        callbackData->in[i] = in[i * NUM_CHANNELS];
+    }
+
+    fftw_execute(callbackData->p);
+
+    //since I don't want to allocate new memory, I will change the real part of the fft result to its whole magnitude
+    //for every element in the loop below
+    for (int i = callbackData->startIndex; i < callbackData->startIndex + callbackData->spectrogramSize; i++) {
+        callbackData->in[i] = SpectroHandler::getMagnitudeAt(i);
+    }
+
+    //this is a rly bad workaround but it is time-optimal
+    const double* magnitudeArr = callbackData -> in;
+
+    const std::string notes = PianoLogic::topFivePeaksString(magnitudeArr, callbackData->spectrogramSize, callbackData->startIndex);
+    const double volume = PianoLogic::getVolume(magnitudeArr, callbackData->spectrogramSize);
+
+    printf("\r");//return cursor to left side of screen
+
+    printf("Volume: %.4lf  ", volume);
+    printf("%s", notes.c_str());
+
+
+    fflush(stdout);
+
+    return 0;
+}
+
 
 
 int CallbackFunctions::noDisplay(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {

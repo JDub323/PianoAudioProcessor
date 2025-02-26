@@ -116,12 +116,12 @@ void SpectroHandler::saveSpectroData() {
  * spectrogramData, so the information actually means something.
  */
 double SpectroHandler::getMagnitudeAt(const int index) {
-    constexpr double maxScaleBy = 20;
     const double *complex = spectrogramData->out[index];
 
     double indexMultiplier = 1;
 
     if constexpr (AMPLIFY_HIGH_FREQUENCIES) {
+        constexpr double maxScaleBy = 20;
         const double slope = (maxScaleBy - 1)/(SPECTROGRAM_SIZE - 1);
         indexMultiplier = slope * (index - 1) + 1;
     }
