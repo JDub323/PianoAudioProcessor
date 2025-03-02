@@ -10,11 +10,11 @@
 #define SHOW_NUM_DEVICES false
 #define SAMPLE_RATE currentDevice.sampleRate
 #define FRAMES_PER_BUFFER 4096
-#define SCALING_FACTOR 2    //keep this low when analyzing audio to avoid aliasing, but this can stay high when looking at images, as a rule, 10-30+ for images, and 1-3 for saving them
+#define SCALING_FACTOR 1    //keep this low when analyzing audio to avoid aliasing, but this can stay high when looking at images, as a rule, 10-30+ for images, and 1-3 for saving them
 #define NUM_CHANNELS currentDevice.numChannels
 #define START_FREQUENCY 20
 #define END_FREQUENCY 20000
-#define RECORDING_TIME 20
+#define RECORDING_TIME 10
 #define MAX_INTERESTING_FREQUENCY 10000
 
 #include <portaudio.h>
@@ -40,7 +40,7 @@ static constexpr deviceSettings newAirpodsMic = {3,44100.0,1};
 static constexpr deviceSettings laptopMicWithSecondMonitor = {1, 44100.0, 2};
 static constexpr deviceSettings laptopSpeakerWithSecondMonitor = {27, 48000.0, 2};
 
-static constexpr deviceSettings currentDevice = laptopMic;
+static constexpr deviceSettings currentDevice = newAirpodsSpeaker;
 
 class AudioFinder {
 public:

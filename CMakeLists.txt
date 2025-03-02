@@ -23,6 +23,8 @@ add_executable(PianoAudioProcessor tests/UnitTests.cpp
         noteLogic/NoteData.h
         noteLogic/NoteHistory.cpp
         noteLogic/NoteHistory.h
+        noteLogic/NoteFileHandler.cpp
+        noteLogic/NoteFileHandler.h
 
         #        imgui/imconfig.h
 #        imgui/imgui.cpp

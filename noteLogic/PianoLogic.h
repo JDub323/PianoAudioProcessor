@@ -9,18 +9,30 @@
 #define PIANOLOGIC_H
 #include <cstdint>
 #include <string>
-#include <vector>
+
+//sufficient volumes for now, can blend these together in the future perhaps (linear/exponential interpolation??) TODO
+#define VOL_PP 0
+#define VOL_P 1
+#define VOL_MP 2
+#define VOL_MF 3
+#define VOL_F 4
+#define VOL_FF 5
 
 class PianoLogic {
 public:
     static std::string topFivePeaksString(const double* arr, int size, int searchStartIndex);
     static std::string calcKeyString(int pianoKey);
+    static std::string calcVolumeString(int volume);
+
     //takes the riemann sum and normalizes the result on a standard scale.
     //normalizes the result (finds the average value instead of the sum of frequencies)
     //note that the getMagnitudeAt function of SpectroHandler also normalizes the sum, which
     //is not default behavior for fftw3
     static double getVolume(const double* arr, int size);
 
+    //measures the error between two functions (frequency distributions) by summing the
+    //squared difference in value at each index. Divide by N to normalize among different window widths
+    static double variance(const double* arr1, const double* arr2, int size, int startIndex);
     static void testPianoIndexFinder();
 
 private:

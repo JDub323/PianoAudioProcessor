@@ -27,8 +27,10 @@ public:
     static PaCallbackFunction frequencyDomainAmplitudeDisplay;
     static PaCallbackFunction basicPianoDomainAmplitudeDisplay;
     static PaCallbackFunction displayTopFiveDetectedNotes;
+    static PaCallbackFunction printVolumeHistory;
     static PaCallbackFunction noDisplay;
     static PaCallbackFunction noDisplaySaveMagnitudeHistory;
+    static PaCallbackFunction listenForSingleNote;
     static PaCallbackFunction noDisplayPlayQueuedAudio;//TODO
 };
 

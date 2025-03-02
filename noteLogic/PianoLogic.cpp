@@ -50,10 +50,47 @@ std::string PianoLogic::calcKeyString(const int pianoKey) {
     return ret;
 }
 
+std::string PianoLogic::calcVolumeString(const int volume) {
+    std::string ret;
+    switch (volume) {
+        case VOL_PP:
+            ret = "pp";
+            break;
+        case VOL_P:
+            ret = "p";
+            break;
+        case VOL_MP:
+            ret = "mp";
+            break;
+        case VOL_MF:
+            ret = "mf";
+            break;
+        case VOL_F:
+            ret = "f";
+            break;
+        case VOL_FF:
+            ret = "ff";
+            break;
+        default:
+            ret = "Not a valid input";
+    }
+
+    return ret;
+}
+
 double PianoLogic::getVolume(const double *arr, const int size) {
     const double sum = riemannSum(arr, size);
     constexpr double scalingFactor = 1;
     return scalingFactor * sum / static_cast<double>(SpectroHandler::SPECTROGRAM_SIZE);
+}
+
+double PianoLogic::variance(const double *arr1, const double *arr2, const int size, const int startIndex) {
+    double sum = 0;
+    for (int i = startIndex; i < size + startIndex; i++) {
+        sum += std::pow(arr1[i] - arr2[i], 2);
+    }
+
+    return sum;
 }
 
 void PianoLogic::testPianoIndexFinder() {

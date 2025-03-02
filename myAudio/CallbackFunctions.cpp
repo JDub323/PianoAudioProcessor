@@ -130,6 +130,8 @@ int CallbackFunctions::basicPianoDomainAmplitudeDisplay(const void *inputBuffer,
 }
 
 int CallbackFunctions::displayTopFiveDetectedNotes(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
+    constexpr float MIN_VOLUME = .0003;//if it is quieter, do not consider it a note
+
     auto* in = (float*) inputBuffer;
     (void)outputBuffer;
     auto* callbackData = static_cast<streamCallbackData *>(userData);
@@ -146,7 +148,7 @@ int CallbackFunctions::displayTopFiveDetectedNotes(const void *inputBuffer, void
         callbackData->in[i] = SpectroHandler::getMagnitudeAt(i);
     }
 
-    //this is a rly bad workaround but it is time-optimal
+    //this is a rly bad workaround, but it is time-optimal: I don't need to spend time making better code
     const double* magnitudeArr = callbackData -> in;
 
     const std::string notes = PianoLogic::topFivePeaksString(magnitudeArr, callbackData->spectrogramSize, callbackData->startIndex);
@@ -155,7 +157,8 @@ int CallbackFunctions::displayTopFiveDetectedNotes(const void *inputBuffer, void
     printf("\r");//return cursor to left side of screen
 
     printf("Volume: %.4lf  ", volume);
-    printf("%s", notes.c_str());
+    if (volume > MIN_VOLUME) printf("%s", notes.c_str());
+    else printf("Too quiet                                   ");
 
 
     fflush(stdout);
@@ -163,6 +166,45 @@ int CallbackFunctions::displayTopFiveDetectedNotes(const void *inputBuffer, void
     return 0;
 }
 
+int CallbackFunctions::printVolumeHistory(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
+    constexpr float MIN_VOLUME = .0003;//if it is quieter, do not consider it a note
+
+    auto* in = (float*) inputBuffer;
+    (void)outputBuffer;
+    auto* callbackData = static_cast<streamCallbackData *>(userData);
+
+    for (unsigned long i = 0; i < framesPerBuffer; i++) {
+        callbackData->in[i] = in[i * NUM_CHANNELS];
+    }
+
+    fftw_execute(callbackData->p);
+
+    //since I don't want to allocate new memory, I will change the real part of the fft result to its whole magnitude
+    //for every element in the loop below
+    for (int i = callbackData->startIndex; i < callbackData->startIndex + callbackData->spectrogramSize; i++) {
+        callbackData->in[i] = SpectroHandler::getMagnitudeAt(i);
+    }
+
+    //this is a rly bad workaround, but it is time-optimal: I don't need to spend time making better code
+    const double* magnitudeArr = callbackData -> in;
+
+    constexpr bool printNoteAnyway = true;
+    if (const double volume = PianoLogic::getVolume(magnitudeArr, callbackData->spectrogramSize);
+            volume > MIN_VOLUME || printNoteAnyway) {
+
+        printf("%lf ", volume);
+        double i = 0;
+        while (i < volume) {
+            printf("#");
+            i += 0.0001;
+        }
+
+        printf("\n");
+    }
+    fflush(stdout);
+
+    return 0;
+}
 
 
 int CallbackFunctions::noDisplay(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {

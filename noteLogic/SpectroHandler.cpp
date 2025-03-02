@@ -114,8 +114,10 @@ void SpectroHandler::saveSpectroData() {
 /*
  * returns the magnitude of spectrogramData at the desired index. Should be called after fft has been performed on
  * spectrogramData, so the information actually means something.
+ * scales up the magnitude by SCALING_FACTOR and responds to macros like AMPLIFY_HIGH_FREQUENCIES to return a
+ * (you guessed it) greater amplitude if the index is high :P
  */
-double SpectroHandler::getMagnitudeAt(const int index) {
+double SpectroHandler::getMagnitudeAt(const int index) {//TODO: add a bool to scale up for image processing/avoid aliasing
     const double *complex = spectrogramData->out[index];
 
     double indexMultiplier = 1;

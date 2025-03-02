@@ -96,7 +96,7 @@ void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
 // }
 
 /*
- * listens for a set period of time as defined by audioFinder (standard), but does not display to the terminal,
+ * listens for a set period of time as defined by audioFinder, but does not display to the terminal,
  * instead summing each of the buckets around a piano key and saving it on a pgm file. The file has a size
  */
 void spectroImageFileTest(const bool saveOnlyPianoKeys) {
@@ -257,7 +257,7 @@ void testSpectroConversions() {//this works except the spectro size is not neces
 
 int main() {
     //printAllMicOptions();
-    variableTimeTerminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
+    variableTimeTerminalDisplayTest(CallbackFunctions::printVolumeHistory);
     //setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
     //bucketCrossoverTest();
     //spectroImageFileTest(false);
