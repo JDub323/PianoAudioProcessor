@@ -7,6 +7,8 @@
 #include <conio.h>
 #include <cstdio>
 #include <portaudio.h>
+#include <filesystem>
+#include <fstream>
 
 #include "PianoLogic.h"
 #include "../myAudio/AudioFinder.h"
@@ -14,10 +16,12 @@
 
 #include "SpectroHandler.h"
 
+#define PATH_TO_DATABASE "../noteDatabase/"
+
 typedef struct {
-    double previousVolume = 1;  //set to 1 so the first volume read is not interpreted as a major increase
-    streamCallbackData* spectroData = SpectroHandler::spectrogramData;  //this will always be the global var. Should it have been a global var? no
-    bool stillRecording = true;
+    double previousVolume;
+    streamCallbackData* spectroData;
+    bool stillRecording;
 
 } noteProgramData;
 
@@ -104,4 +108,54 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
 
     printf("When ready to begin, press \'r\'");
 
+}
+
+void NoteFileHandler::initializeMyProgramData() {
+    myProgramData = new noteProgramData{1,  //set to 1 so the first volume read is not interpreted as a major increase
+        SpectroHandler::spectrogramData, //this will always be the global var. Should it have been a global var? no
+    true};  //it is true that it is still recording
+}
+
+bool NoteFileHandler::noteFileExists(const std::string& fileName) {
+    return std::filesystem::exists(PATH_TO_DATABASE + fileName);
+}
+
+std::string NoteFileHandler::calcFileName(const int note, const int strength) {
+    return PianoLogic::calcKeyString(note) + PianoLogic::calcVolumeString(strength) + ".dat";
+}
+
+
+void NoteFileHandler::saveNote(const int note, const int strength, const int noteSize, const double samplesPerSecond,
+    const int samplesPerBuffer, const int spectroWidth, const int spectroFirstIndex, const int numTicks, const uint8_t* magnitudeArr) {
+
+    const std::string fileName = calcFileName(note, strength);
+
+    //make and open file
+    std::ofstream file(PATH_TO_DATABASE + fileName, std::ios::out);
+    if (!file) {//TODO: check to see if this is the way to exit from this function
+        printf("Error opening file");
+        SpectroHandler::deallocateMagnitudeHistoryMemory();
+        exit(EXIT_FAILURE);
+    }
+
+    //write beginning formatting to file
+    file << note << " " << strength << "\n"
+    << noteSize << " " << spectroWidth << " " << spectroFirstIndex << " " << numTicks << "\n"
+    << samplesPerSecond << " " << samplesPerBuffer << "\n";
+
+    file.close();
+    file.open(fileName, std::ios::out | std::ios::app | std::ios::binary);
+
+    //check to see if there was another error opening the file
+    if (!file) {//check here too
+        printf("Error opening file");
+        SpectroHandler::deallocateMagnitudeHistoryMemory();
+        exit(EXIT_FAILURE);
+    }
+
+    file.write(reinterpret_cast<const char *>(magnitudeArr), spectroWidth * numTicks * noteSize);
+}
+
+bool NoteFileHandler::noteExistsWithCurrentSettings(int note, int vol) {
+    return
 }
