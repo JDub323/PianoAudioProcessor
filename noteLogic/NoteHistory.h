@@ -35,15 +35,15 @@ public:
     //returns whether a note is actually on. Checks the history, including the second from the top.
     //consider making a minimum value for a key to be turned on; otherwise, risk saying a key is on
     //when floating point errors may cause the on - off of a note to be slightly positive
-    bool isOn(int key, int timeTick);
+    bool isOn(int key, int timeTick);//TODO
 
     //returns the most recent on press and off press of a key. To be used by the Piano Logic class with NoteData to
     //return a frequency at a point in time
     //MAY CHANGE THIS METHOD
-    keyTickData getNote(int key);
+    keyTickData getNote(int key);//TODO
 
     //adds a note to the saved history. Will also add ending notes to save history if amplitude is negative
-    void addNote(int key, int tick, float volume);
+    void addNote(int key, int tick, float volume);//TODO
 
 
 

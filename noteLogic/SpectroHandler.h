@@ -14,6 +14,7 @@
 //here loudness is defined as the riemann sum of all of the
 #define CONSTANT_LOUDNESS_OVER_TIME false
 
+//This struct is meant for audio input, taking the STFT of audio data from the mic or speaker
 typedef struct {
     double* in;
     fftw_complex* out;
@@ -22,11 +23,30 @@ typedef struct {
     int spectrogramSize;
 } streamCallbackData;
 
+//This struct is meant for audio output, designed to take the reverse fourier transform from some file
+typedef struct {
+    fftw_complex* in;//data taken from file
+    double* out;//.wav data which is put into the portaudio output buffer
+    fftw_plan p;//fftw plan for the reverse fourier transform half complex to real
+    int startIndex;//start Index of spectrogram
+    int spectrogramSize;//size of spectrogram data from file
+} streamPlaybackData;
+
 class SpectroHandler {
+private:
+    //acts as a circular buffer mediating the data from the file and the program in a portaudio function
+    //to use, call the getNextSpectrogram() function to, as you may guess, get the next spectrogram.
+    //currentFileIndex is augmented automatically. To load the next buffer, call loadNextBuffer().
+    //to know if the next buffer should be loaded, call the bool needToLoadNextBuffer().
+    //should start a thread to
+    static fftw_complex* spectrogramFileData;
+    static int currentFileIndex;
+
 public:
     //contains data on input and output buffers, the plan used for the callback function, the beginning index of the
     //spectrogram, and the size of the spectrogram
     static streamCallbackData* spectrogramData;
+    static streamPlaybackData* playbackSpectroData;
 
     const static int SPECTROGRAM_SIZE;
     const static int TOTAL_SAMPLES;
@@ -40,10 +60,19 @@ public:
     static uint8_t* spectrogramMagnitudeHistory;
     static int currentMagnitudeIndex;
 
+    //functions to manipulate the
+
+    //functions for audio input
     static void initializeSpectrogramData();
     static void allocateMagnitudeHistoryMemory(bool saveKeysOnly);
     static void deallocateSpectrogramData();
     static void deallocateMagnitudeHistoryMemory();
+
+    //functions for audio output
+    static void initializePlaybackSpectroData();
+    static void initializeFileData();//include checks to make sure the saved format is the same as the current format
+    static void deallocatePlaybackSpectroData();
+    static void deallocateFileData();
 
     static void saveSpectroData();
 

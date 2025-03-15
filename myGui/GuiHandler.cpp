@@ -4,10 +4,6 @@
 
 #include "guiHandler.h"
 
-#include "imgui.h"
-#include "../imgui/backends/imgui_impl_win32.h"
-#include "../imgui/backends/imgui_impl_dx11.h"
-#include "../implot/implot.h"
 #include <windows.h>
 #include <d3d11.h>
 //#pragma comment(lib, "d3d11.lib") // Links the Direct3D 11 library

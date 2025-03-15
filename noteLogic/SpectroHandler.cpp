@@ -61,8 +61,9 @@ void SpectroHandler::initializeSpectrogramData() {
  * if recording for 10 seconds, the full spectrogram uses 195 kilobytes of data,
  * if recording for 10 seconds, saving only piano frequencies uses 17.2 kilobytes of data
  * slightly more data is used if recording at 48000 hz
+ *
+ * MAGNITUDE HISTORY IS NOT SUFFICIENT TO UNDO THE FOURIER TRANSFORM
  */
-
 void SpectroHandler::allocateMagnitudeHistoryMemory(const bool saveKeysOnly) {
     if (!saveKeysOnly)spectrogramMagnitudeHistory = static_cast<uint8_t*>(malloc(sizeof(uint8_t) * TOTAL_SAMPLES));
 

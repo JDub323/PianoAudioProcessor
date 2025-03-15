@@ -10,7 +10,7 @@
 class Note {
 public:
     explicit Note(const int index) : noteNumber(index) {//explicit no longer necessary if another parameter is added
-        printf("Constructor called, index is %d", noteNumber);
+        printf("Constructor called, index is %d\n", noteNumber);
         //consider, if no file of precalculated data is saved, adding the feature to tune the tool for the piano here
 
         //will malloc precalculated data to return a pointer to a vector in 927 space from two parameters, dynamics
@@ -22,7 +22,7 @@ public:
     ~Note() {
         printf("Destructor called");
     }
-    float* getFreqDistribution(int tickValue);  //how this is implemented depends on any patterns found in
+    float* getFreqDistribution(int tickValue);  //TODO (this is an object which makes up the note history class)
 
 private:
     int noteNumber;
