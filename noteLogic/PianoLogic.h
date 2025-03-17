@@ -82,6 +82,7 @@ private:
  *
  *          DO NEXT 2 EARLIER
 *              5 freq-time-amplitude array --> .wav data (reverse fft)
+ *                      This array must be, seemingly, half the count and also complex numbers (fftw_half complex to real)
 *
  *             6 .wav data played on speakers through portaudio
  *
