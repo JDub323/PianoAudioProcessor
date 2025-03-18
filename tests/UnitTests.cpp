@@ -6,7 +6,6 @@
 #include <cmath>
 #include <fftw3.h>
 #include <portaudio.h>
-#include <imgui.h>
 #include <string>
 #include <conio.h>  // for _kbhit() and _getch()
 #include "../myAudio/AudioFinder.h"
@@ -21,19 +20,19 @@ void setTimeTerminalDisplayTest(const PaCallbackFunction function) {
     //allows half-block characters to be written in terminal
     SetConsoleOutputCP(CP_UTF8);
 
-    AudioFinder::connectToMic();
+    AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData();
+    SpectroHandler::initializeSpectrogramData(false);
 
     Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
     AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
 
     Pa_Sleep(RECORDING_TIME * 1000);
 
-    AudioFinder::pauseRecording();
+    AudioFinder::pausePortAudio();
 
-    AudioFinder::micQuitAndDeallocate();
+    AudioFinder::quitAndDeallocate();
 
     SpectroHandler::deallocateSpectrogramData();
 }
@@ -42,10 +41,10 @@ void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
     //allows half-block characters to be written in terminal
     SetConsoleOutputCP(CP_UTF8);
 
-    AudioFinder::connectToMic();
+    AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData();
+    SpectroHandler::initializeSpectrogramData(false);
 
     Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
 
@@ -61,15 +60,15 @@ void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
         Pa_Sleep(100); // Sleep to prevent high CPU usage
     }
 
-    AudioFinder::pauseRecording();
+    AudioFinder::pausePortAudio();
 
-    AudioFinder::micQuitAndDeallocate();
+    AudioFinder::quitAndDeallocate();
 
     SpectroHandler::deallocateSpectrogramData();
 }
 
 // void imguiFrequencyDisplayTest(const bool useLogarithmicScaling, const bool saveSpectrogramData) {
-//     AudioFinder::connectToMic();                               //connect to mic
+//     AudioFinder::initializePortAudio();                               //connect to mic
 //     SpectroHandler::initializeSpectrogramData();               //initialize fftw
 //     if (saveSpectrogramData) {
 //         SpectroHandler::allocateMagnitudeHistoryMemory();      //allocate memory to save magnitude history
@@ -82,7 +81,7 @@ void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
 //     //code sleeps here until the window is closed
 //
 //     //handle closing & ending the plot?
-//     AudioFinder::pauseRecording();                 //stop listening
+//     AudioFinder::pausePortAudio();                 //stop listening
 //     AudioFinder::quitAndDeallocate();              //deallocate Portaudio
 //     GuiHandler::shutDownImgui();                   //close window
 //
@@ -100,10 +99,10 @@ void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
  * instead summing each of the buckets around a piano key and saving it on a pgm file. The file has a size
  */
 void spectroImageFileTest(const bool saveOnlyPianoKeys) {
-    AudioFinder::connectToMic();
+    AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData();
+    SpectroHandler::initializeSpectrogramData(false);
 
     SpectroHandler::allocateMagnitudeHistoryMemory(saveOnlyPianoKeys);//allocate memory to save magnitude history
 
@@ -112,9 +111,9 @@ void spectroImageFileTest(const bool saveOnlyPianoKeys) {
 
     Pa_Sleep(RECORDING_TIME * 1000);
 
-    AudioFinder::pauseRecording();
+    AudioFinder::pausePortAudio();
 
-    AudioFinder::micQuitAndDeallocate();
+    AudioFinder::quitAndDeallocate();
 
     SpectroHandler::deallocateSpectrogramData();
 
@@ -158,7 +157,7 @@ void bucketCrossoverTest() {
 
 //prints all available microphone options
 void printAllMicOptions() {
-    AudioFinder::connectToMic();
+    AudioFinder::initializePortAudio();
 
     const int numDevices = Pa_GetDeviceCount();
 
@@ -177,6 +176,7 @@ void printAllMicOptions() {
         const PaDeviceInfo *deviceInfo = Pa_GetDeviceInfo(i);
         printf("Device %d:\n", i);
         printf("  name: %s\n", deviceInfo->name);
+        fflush(stdout); //some names are too long, make sure all names are printed
         printf("  maxInputChannels: %d\n", deviceInfo->maxInputChannels);
         printf("  maxOutputChannels: %d\n", deviceInfo->maxOutputChannels);
         printf("  defaultSampleRate: %f\n", deviceInfo->defaultSampleRate);
@@ -210,10 +210,10 @@ void testFileMaker() {
 //this function is basically spectroImageFileTest() but without accessing portaudio
 //it works!! :)
 void testSpectroSaver(const bool saveOnlyPianoKeys) {
-    //AudioFinder::connectToMic();
+    //AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData();
+    SpectroHandler::initializeSpectrogramData(false);
 
     SpectroHandler::allocateMagnitudeHistoryMemory(saveOnlyPianoKeys);//allocate memory to save magnitude history
 
@@ -226,7 +226,7 @@ void testSpectroSaver(const bool saveOnlyPianoKeys) {
 
     //Pa_Sleep(RECORDING_TIME * 1000);
 
-    //AudioFinder::pauseRecording();
+    //AudioFinder::pausePortAudio();
 
     //AudioFinder::quitAndDeallocate();
 
@@ -255,10 +255,28 @@ void testSpectroConversions() {//this works except the spectro size is not neces
     }
 }
 
+void setTimeSpeakerTest(PaCallbackFunction function) {
+    AudioFinder::initializePortAudio();
+
+    //initialize global variable spectrogramData
+    SpectroHandler::initializeSpectrogramData(true);
+
+    Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
+    AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
+
+    Pa_Sleep(RECORDING_TIME * 1000);
+
+    AudioFinder::pausePortAudio();
+
+    AudioFinder::quitAndDeallocate();
+
+    SpectroHandler::deallocateSpectrogramData();
+}
+
 int main() {
-    //printAllMicOptions();
-    variableTimeTerminalDisplayTest(CallbackFunctions::printVolumeHistory);
-    //setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
+    printAllMicOptions();
+    //variableTimeTerminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
+    setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
     //bucketCrossoverTest();
     //spectroImageFileTest(false);
     //testFileMaker();
