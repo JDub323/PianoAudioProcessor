@@ -88,24 +88,28 @@ void AudioFinder::quitAndDeallocate() {
     checkErr(err);
 }
 
+AudioSettings AudioFinder::getAudioSettings() {
+    return currentSettings;
+}
+
 //initializePortAudio() must have been called previously. Will use the microphone defined by "currentDevice" variable.
 //
 void AudioFinder::startPlaying(PaCallbackFunction callbackFunction, void *userData) {
-    constexpr int inputDevice = currentDevice.deviceNum;
+    constexpr int outputDevice = currentDevice.deviceNum;
 
-    PaStreamParameters inputParameters = {};
+    PaStreamParameters outputParameters = {};
 
     //initialize input stream parameters for portaudio
-    inputParameters.channelCount = NUM_CHANNELS;
-    inputParameters.device = inputDevice;
-    inputParameters.hostApiSpecificStreamInfo = nullptr;
-    inputParameters.sampleFormat = paFloat32;
-    inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputDevice)->defaultLowInputLatency;
+    outputParameters.channelCount = NUM_CHANNELS;
+    outputParameters.device = outputDevice;
+    outputParameters.hostApiSpecificStreamInfo = nullptr;
+    outputParameters.sampleFormat = paFloat32;
+    outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputDevice)->defaultLowOutputLatency;
 
     PaError err = Pa_OpenStream(
             &stream,
-            &inputParameters,
             nullptr,
+            &outputParameters,
             SAMPLE_RATE,
             FRAMES_PER_BUFFER,
             paNoFlag,

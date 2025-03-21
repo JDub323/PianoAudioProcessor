@@ -14,11 +14,13 @@
 #define NUM_CHANNELS currentDevice.numChannels
 #define START_FREQUENCY 20
 #define END_FREQUENCY 20000
-#define RECORDING_TIME 20
+#define RECORDING_TIME 10
 #define MAX_INTERESTING_FREQUENCY 10000
 
 #include <portaudio.h>
 #include <cstdio>
+
+#include "../noteLogic/SpectroHandler.h"
 
 typedef struct {
     int deviceNum;
@@ -57,6 +59,16 @@ typedef int (PaCallbackFunction)(const void* inputBuffer, void* outputBuffer,
                                  PaStreamCallbackFlags statusFlags,
                                  void* userData);
 
+typedef struct {
+    const double samplesPerSecond;
+    const int samplesPerBuffer;
+    const int spectroWidth;
+    const int spectroFirstIndex;
+} AudioSettings;
+
+static constexpr AudioSettings currentSettings = {SAMPLE_RATE, FRAMES_PER_BUFFER,
+    SpectroHandler::spectrogramData -> spectrogramSize, SpectroHandler::spectrogramData -> startIndex};
+
 class AudioFinder {
 public:
     static void initializePortAudio();
@@ -64,6 +76,7 @@ public:
     static void startPlaying(PaCallbackFunction callbackFunction, void *userData);
     static void pausePortAudio();
     static void quitAndDeallocate();
+    static AudioSettings getAudioSettings();
 
 
 

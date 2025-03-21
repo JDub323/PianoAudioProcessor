@@ -31,6 +31,7 @@ public:
     static PaCallbackFunction printVolumeHistory;
     static PaCallbackFunction noDisplay;
     static PaCallbackFunction noDisplaySaveMagnitudeHistory;
+    static PaCallbackFunction listenForSingleNote;//saves single note, meant to save note in the noteDatabase
 
     //OUTPUT CALLBACK FUNCTIONS
     static PaCallbackFunction noDisplayPlaySineWave;

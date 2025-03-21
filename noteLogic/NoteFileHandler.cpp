@@ -36,7 +36,7 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
         return;
     }
 
-    AudioFinder::connectToMic();
+    AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
     SpectroHandler::initializeSpectrogramData();
@@ -82,7 +82,7 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
             Pa_Sleep(100);
         }
 
-        AudioFinder::pauseRecording();
+        AudioFinder::pausePortAudio();
 
         //check to see if the note was played well enough to pass (sufficient volume and harmonics that are at least close)
         //if the note is good enough, save the file and move on, otherwise try again
@@ -97,7 +97,7 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
     }
 
 
-    AudioFinder::micQuitAndDeallocate();
+    AudioFinder::quitAndDeallocate();
 
     SpectroHandler::deallocateSpectrogramData();
 
@@ -125,8 +125,9 @@ std::string NoteFileHandler::calcFileName(const int note, const int strength) {
 }
 
 
-void NoteFileHandler::saveNote(const int note, const int strength, const int noteSize, const double samplesPerSecond,
-    const int samplesPerBuffer, const int spectroWidth, const int spectroFirstIndex, const int numTicks, const uint8_t* magnitudeArr) {
+void NoteFileHandler::saveNote(const AudioSettings settings, const int note,
+    const int strength,
+    const int noteSize, const int numTicks, const uint8_t* magnitudeArr) {
 
     const std::string fileName = calcFileName(note, strength);
 
@@ -139,9 +140,9 @@ void NoteFileHandler::saveNote(const int note, const int strength, const int not
     }
 
     //write beginning formatting to file
-    file << note << " " << strength << "\n"
-    << noteSize << " " << spectroWidth << " " << spectroFirstIndex << " " << numTicks << "\n"
-    << samplesPerSecond << " " << samplesPerBuffer << "\n";
+    file << note << " " << strength << " " << noteSize << " " << numTicks << "\n"
+    << settings.spectroWidth << " " << settings.spectroFirstIndex << " "
+    << settings.samplesPerSecond << " " << settings.samplesPerBuffer << "\n";
 
     file.close();
     file.open(fileName, std::ios::out | std::ios::app | std::ios::binary);
@@ -153,9 +154,41 @@ void NoteFileHandler::saveNote(const int note, const int strength, const int not
         exit(EXIT_FAILURE);
     }
 
-    file.write(reinterpret_cast<const char *>(magnitudeArr), spectroWidth * numTicks * noteSize);
+    file.write(reinterpret_cast<const char *>(magnitudeArr), settings.spectroWidth * numTicks * noteSize);
 }
 
-bool NoteFileHandler::noteExistsWithCurrentSettings(int note, int vol) {
-    return
+bool NoteFileHandler::noteExistsWithCurrentSettings(const int note, const int strength) {
+    FILE* fptr = fopen(calcFileName(note,strength).c_str(), "r");
+    if (fptr == nullptr) {
+        //file with such a name and strength does not exist, therefore, return false
+        fclose(fptr);
+        return false;
+    }
+
+    return audioSettingsMatch(getAudioSettings(fptr), AudioFinder::getAudioSettings());
+}
+
+//Assume the file pointer is opened on read mode
+AudioSettings NoteFileHandler::getAudioSettings(FILE *fptr) {
+    //skip the first line, not useful information
+    char buffer[20];
+    fgets(buffer, 20, fptr);    //skip the first line which contains irrelevant information
+
+    constexpr AudioSettings ret = {};
+
+    fscanf(fptr, "%d", &ret.spectroWidth);
+    fscanf(fptr, "%d", &ret.spectroFirstIndex);
+    fscanf(fptr, "%d", &ret.samplesPerSecond);
+    fscanf(fptr, "%d", &ret.samplesPerBuffer);
+
+    return ret;
+}
+
+bool NoteFileHandler::audioSettingsMatch(const AudioSettings a, const AudioSettings b) {
+    if (a.spectroWidth != b.spectroWidth) return false;
+    if (a.samplesPerBuffer != b.samplesPerBuffer) return false;
+    if (a.samplesPerSecond != b.samplesPerSecond) return false;
+    if (a.spectroFirstIndex != b.spectroFirstIndex) return false;
+
+    return true;
 }

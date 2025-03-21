@@ -46,7 +46,6 @@ public:
     //contains data on input and output buffers, the plan used for the callback function, the beginning index of the
     //spectrogram, and the size of the spectrogram
     static streamCallbackData* spectrogramData;
-    static streamPlaybackData* playbackSpectroData;
 
     const static int SPECTROGRAM_SIZE;
     const static int TOTAL_SAMPLES;

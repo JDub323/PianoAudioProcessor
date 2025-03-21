@@ -23,7 +23,7 @@ void setTimeTerminalDisplayTest(const PaCallbackFunction function) {
     AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData(false);
+    SpectroHandler::initializeSpectrogramData();
 
     Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
     AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
@@ -44,7 +44,7 @@ void variableTimeTerminalDisplayTest(const PaCallbackFunction function) {
     AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData(false);
+    SpectroHandler::initializeSpectrogramData();
 
     Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
 
@@ -102,7 +102,7 @@ void spectroImageFileTest(const bool saveOnlyPianoKeys) {
     AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData(false);
+    SpectroHandler::initializeSpectrogramData();
 
     SpectroHandler::allocateMagnitudeHistoryMemory(saveOnlyPianoKeys);//allocate memory to save magnitude history
 
@@ -213,7 +213,7 @@ void testSpectroSaver(const bool saveOnlyPianoKeys) {
     //AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData(false);
+    SpectroHandler::initializeSpectrogramData();
 
     SpectroHandler::allocateMagnitudeHistoryMemory(saveOnlyPianoKeys);//allocate memory to save magnitude history
 
@@ -259,7 +259,7 @@ void setTimeSpeakerTest(PaCallbackFunction function) {
     AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializeSpectrogramData(true);
+    SpectroHandler::initializePlaybackSpectroData();
 
     Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
     AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
