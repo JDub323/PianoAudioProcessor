@@ -1,9 +1,7 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.29)
 project(PianoAudioProcessor)
 
 set(CMAKE_CXX_STANDARD 20)
-set(FFTW3_DIR C:/Users/jwhal/.vcpkg-clion/vcpkg/packages/fftw3_x64-mingw-dynamic/share/fftw3)       #DO NOT COMMIT THESE LOCAL CHANGES
-set(portaudio_DIR C:/Users/jwhal/.vcpkg-clion/vcpkg/packages/portaudio_x64-mingw-dynamic/share/portaudio)
 
 add_executable(PianoAudioProcessor tests/UnitTests.cpp
         MyAudio/AudioFinder.cpp

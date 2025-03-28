@@ -36,7 +36,7 @@ typedef struct {
 
 //INPUT DEVICES
 static constexpr deviceSettings laptopMic = {1, 44100.0, 2};
-static constexpr deviceSettings laptopInSpeaker = {24, 48000.0, 2};
+static constexpr deviceSettings laptopInSpeaker = {19, 48000.0, 2};
 static constexpr deviceSettings airpodsProInSpeaker = {30, 48000.0, 2};
 static constexpr deviceSettings airpodsProMic = {0,44100.0,1};
 static constexpr deviceSettings newAirpodsInSpeaker = {28,48000.0,2};
@@ -44,12 +44,11 @@ static constexpr deviceSettings newAirpodsMic = {3,44100.0,1};
 static constexpr deviceSettings laptopMicWithSecondMonitor = {1, 44100.0, 2};
 static constexpr deviceSettings laptopInSpeakerWithSecondMonitor = {27, 48000.0, 2};
 
-static constexpr deviceSettings oldLaptopMic = {0, 44100.0, 2};
-
 //OUTPUT DEVICES
-static constexpr deviceSettings oldLaptopOutSpeaker = {};//idk yet
+//(much empty)
 
-static constexpr deviceSettings currentDevice = oldLaptopMic;
+//CURRENT DEVICE
+static constexpr deviceSettings currentDevice = laptopInSpeaker;
 
 
 //TODO: add comments
@@ -66,8 +65,8 @@ typedef struct {
     const int spectroFirstIndex;
 } AudioSettings;
 
-static constexpr AudioSettings currentSettings = {SAMPLE_RATE, FRAMES_PER_BUFFER,
-    SpectroHandler::spectrogramData -> spectrogramSize, SpectroHandler::spectrogramData -> startIndex};
+static AudioSettings currentSettings = {SAMPLE_RATE, FRAMES_PER_BUFFER,
+    SpectroHandler::SPECTROGRAM_SIZE, static_cast<int>(std::ceil(FRAMES_PER_BUFFER / SAMPLE_RATE * START_FREQUENCY))};
 
 class AudioFinder {
 public:

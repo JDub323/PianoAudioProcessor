@@ -245,12 +245,30 @@ int CallbackFunctions::noDisplayPlaySineWave(const void *inputBuffer, void *outp
     (void)userData;
 
     static int x = 0;
-    constexpr int frequency = 440;
 
     for (int i = 0; i < framesPerBuffer; i++) {
+        constexpr int frequency = 440;
         out[i] = static_cast<float>(std::sin(x * 2 * 3.14159 * frequency / SAMPLE_RATE));
         x++;
     }
 
     return 0;
 }
+
+int CallbackFunctions::noDisplayPlayQueuedAudio(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
+    auto* out = (float*)outputBuffer;
+    (void)inputBuffer;
+
+
+
+    return 0;
+}
+
+int CallbackFunctions::listenForSingleNote(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
+    //cast the inputbuffer, outputbuffer, and userdata to proper values
+    NoteProgramData
+    //wait for a note to be played
+
+    //
+}
+

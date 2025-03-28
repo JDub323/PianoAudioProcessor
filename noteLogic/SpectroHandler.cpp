@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <vector>
 
+#include "NoteFileHandler.h"
 #include "../myGui/SpectroImageMaker.h"
 
 //precalculated width of the spectrogram. Uses MAX_INTERESTING_FREQUENCY as the maximum frequency produced by a piano, so no memory is allocated which will not be read
@@ -26,6 +27,8 @@ streamCallbackData* SpectroHandler::spectrogramData;
 uint8_t* SpectroHandler::spectrogramMagnitudeHistory;
 
 int SpectroHandler::currentMagnitudeIndex = 0;
+fftw_complex** SpectroHandler::spectrogramFileData;
+streamPlaybackData* SpectroHandler::playbackData;
 
 /*
 * Allocates memory for spectrogramData, and its long input and output arrays, using fftw_malloc() for the arrays.
@@ -91,6 +94,82 @@ void SpectroHandler::deallocateSpectrogramData() {
 //Deallocates spectrogramMagnitudeHistory. MUST BE CALLED AFTER allocateMagnitudeHistoryMemory()
 void SpectroHandler::deallocateMagnitudeHistoryMemory() {
     free(spectrogramMagnitudeHistory);
+}
+
+void SpectroHandler::initializeStreamPlaybackData() {
+    playbackData = static_cast<streamPlaybackData *>(malloc(sizeof(streamPlaybackData)));
+
+    //only the left channel is used
+    //malloc:
+    //since the inverse transform is an in-place transform (the transform is performed on the input pointer and
+    //output pointer) and fftw_complex has size n/2 + 1 (the size of all the non-redundant results) therefore the
+    //output array needs some extra padding to prevent getting overwritten
+    playbackData->in = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) * (FRAMES_PER_BUFFER/2 + 1)));
+
+    //since this is an in-place transformation, there must be padding added (hence 2 * (frames/2 + 1)
+    //for more info, visit https://www.fftw.org/fftw3_doc/One_002dDimensional-DFTs-of-Real-Data.html
+    playbackData->out = static_cast<double *>(fftw_malloc(sizeof(double) * 2 * (FRAMES_PER_BUFFER/2 + 1)));
+
+    //null check
+    if (playbackData->in == nullptr || playbackData->out == nullptr) {
+        printf("Could not allocate playback data\n");
+        exit(EXIT_FAILURE);
+    }
+
+    //creates the plan to be used for fftw
+    playbackData->p = fftw_plan_dft_c2r_1d(FRAMES_PER_BUFFER, playbackData->in, playbackData->out, FFTW_MEASURE);
+
+    //find start and end indexes on spectrogramData
+    constexpr double secondsPerBuffer = FRAMES_PER_BUFFER / SAMPLE_RATE;
+    playbackData->startIndex = std::ceil(secondsPerBuffer * START_FREQUENCY);
+    playbackData->spectrogramSize = SPECTROGRAM_SIZE;
+}
+
+//should be called before any memory is allocated since
+void SpectroHandler::initializeFileData(char* fileName) {
+    //check file name, settings, and if the file settings match the current settings.
+    FILE* fptr = fopen("fileName", "r");
+    if (fptr == nullptr) {
+        printf("Invalid file name. Exiting program.");
+    }
+
+    if (!NoteFileHandler::audioSettingsMatch(currentSettings, NoteFileHandler::getAudioSettings(fptr))) {
+        //TODO: make it so this, instead of quitting the program, changes the current settings to match the file settings
+        printf("ERROR: File settings do not match current settings. Quitting program\n");
+        exit(1);
+    }
+
+    spectrogramFileData = static_cast<fftw_complex **>(fftw_malloc(sizeof(fftw_complex *) * FILE_BUFFER_SIZE));
+    if (spectrogramFileData == nullptr) {
+        printf("Error allocating memory for spectrogramFileData rows. Exiting");
+        exit(EXIT_FAILURE);
+    }
+    for (int i = 0; i < FILE_BUFFER_SIZE; i++) {
+        spectrogramFileData[i] = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex) *  SPECTROGRAM_SIZE));
+
+        if (spectrogramFileData[i] == nullptr) {
+            printf("Error allocating memory for spectrogramFileData column %d. Exiting", i);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    //TODO: maybe start thread which looks to add new file data if needed here
+}
+
+void SpectroHandler::deallocateStreamPlaybackData() {
+    fftw_destroy_plan(playbackData->p);
+    fftw_free(playbackData->in);
+    fftw_free(playbackData->out);
+
+    free(playbackData);
+}
+
+void SpectroHandler::deallocateFileData() {
+    for (int i = 0; i < FILE_BUFFER_SIZE; i++) {
+        fftw_free(spectrogramFileData[i]);
+    }
+
+    fftw_free(spectrogramFileData);//there may be a bug with fftw_free() here rather than free()
 }
 
 /*

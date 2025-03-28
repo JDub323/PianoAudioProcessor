@@ -9,11 +9,22 @@
 
 #include "../myAudio/AudioFinder.h"
 
+typedef struct {
+    double previousVolume;
+    streamCallbackData* spectroData;
+    bool stillRecording;
+
+} NoteProgramData;
+
 
 class NoteFileHandler {
 public:
 
     static void recordNotesAndSaveInFileProgram();
+    static AudioSettings getAudioSettings(FILE* fptr);
+    static bool audioSettingsMatch(AudioSettings a, AudioSettings b);
+    static NoteProgramData* myProgramData;
+
 
 private:
     static void initializeMyProgramData();
@@ -30,8 +41,7 @@ private:
     static void findFirstUnsavedNote(int &note);
     static int getFirstUnsavedVolume(int note);//returns a volume
     static bool noteExistsWithCurrentSettings(int note, int strength);
-    static AudioSettings getAudioSettings(FILE* fptr);
-    static bool audioSettingsMatch(AudioSettings a, AudioSettings b);
+
 };
 
 

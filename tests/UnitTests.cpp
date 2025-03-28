@@ -259,7 +259,7 @@ void setTimeSpeakerTest(PaCallbackFunction function) {
     AudioFinder::initializePortAudio();
 
     //initialize global variable spectrogramData
-    SpectroHandler::initializePlaybackSpectroData();
+    SpectroHandler::initializeStreamPlaybackData();
 
     Pa_Sleep(1000);//wait for system to be ready with terminal so there are no f flush failures
     AudioFinder::startRecording(function, SpectroHandler::spectrogramData);
@@ -275,8 +275,8 @@ void setTimeSpeakerTest(PaCallbackFunction function) {
 
 int main() {
     printAllMicOptions();
-    //variableTimeTerminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
-    setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
+    variableTimeTerminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
+    //setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
     //bucketCrossoverTest();
     //spectroImageFileTest(false);
     //testFileMaker();

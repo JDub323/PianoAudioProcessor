@@ -11,8 +11,12 @@
 #include <fftw3.h>
 
 #define AMPLIFY_HIGH_FREQUENCIES false
+
 //here loudness is defined as the riemann sum of all of the
 #define CONSTANT_LOUDNESS_OVER_TIME false
+
+//this is the number of rows from the file that I have saved at a time.
+#define FILE_BUFFER_SIZE 4
 
 //This struct is meant for audio input, taking the STFT of audio data from the mic or speaker
 typedef struct {
@@ -35,17 +39,24 @@ typedef struct {
 class SpectroHandler {
 private:
     //acts as a circular buffer mediating the data from the file and the program in a portaudio function
+    //this is a 2d array of pointers, with size defined by bufferSize inside the function initializeFileData.
     //to use, call the getNextSpectrogram() function to, as you may guess, get the next spectrogram.
-    //currentFileIndex is augmented automatically. To load the next buffer, call loadNextBuffer().
-    //to know if the next buffer should be loaded, call the bool needToLoadNextBuffer().
-    //should start a thread to
-    static fftw_complex* spectrogramFileData;
+    //currentFileIndex is augmented automatically.
+    //a thread should be run that only sleeps and checks to see if more from the file should be loaded, in
+    //which case, it should load it, obviously.
+    static fftw_complex** spectrogramFileData;
+    //keeps track of location in file
     static int currentFileIndex;
+    static void beginBufferThread();//TODO
+
 
 public:
     //contains data on input and output buffers, the plan used for the callback function, the beginning index of the
     //spectrogram, and the size of the spectrogram
     static streamCallbackData* spectrogramData;
+
+    //the equivalent of spectrogramData, but for audio output
+    static streamPlaybackData* playbackData;
 
     const static int SPECTROGRAM_SIZE;
     const static int TOTAL_SAMPLES;
@@ -68,12 +79,13 @@ public:
     static void deallocateMagnitudeHistoryMemory();
 
     //functions for audio output
-    static void initializePlaybackSpectroData();
-    static void initializeFileData();//include checks to make sure the saved format is the same as the current format
-    static void deallocatePlaybackSpectroData();
+    static void initializeStreamPlaybackData();
+    static void initializeFileData(char* fileName);//include checks to make sure the saved format is the same as the current format
+    static void deallocateStreamPlaybackData();
     static void deallocateFileData();
 
     static void saveSpectroData();
+    static void getNextSpectrogram();//TODO
 
     static double getMagnitudeAt(int index);
     static uint8_t shortenDoubleToByte(double in); //I am considering making this into a short, doubling the precision to a 16 bit standard

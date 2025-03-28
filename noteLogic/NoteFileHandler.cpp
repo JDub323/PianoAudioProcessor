@@ -18,14 +18,7 @@
 
 #define PATH_TO_DATABASE "../noteDatabase/"
 
-typedef struct {
-    double previousVolume;
-    streamCallbackData* spectroData;
-    bool stillRecording;
-
-} noteProgramData;
-
-noteProgramData* myProgramData;
+NoteProgramData* NoteFileHandler::myProgramData;
 
 void NoteFileHandler::recordNotesAndSaveInFileProgram() {
     printf("This program will save the piano notes recorded in a file folder.\n");
@@ -52,10 +45,10 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
     int nextNote = 0;
     int onVolume = VOL_FF;
 
-    while (nextNote < 88 && onVolume > VOL_PP) {
+    while (nextNote < 88 && onVolume >= VOL_PP) {
 
         printf("To begin recording at key %s and volume %s, press 'r'\n",
-        PianoLogic::calcKeyString(nextNote).c_str(), PianoLogic::calcVolumeString(onVolume).c_str());
+            PianoLogic::calcKeyString(nextNote).c_str(), PianoLogic::calcVolumeString(onVolume).c_str());
         printf("To see which notes have already been saved, press 's'\n");
         printf("To exit the program, press 'e'\n");
 
@@ -68,7 +61,7 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
 
         printf("\nWaiting...");
 
-        Pa_Sleep(1000);//wait for the noise from the key to dissipate before listening for a volume spike
+        Pa_Sleep(1000);//wait for the noise from the keystroke to dissipate before listening for a volume spike
 
         AudioFinder::startRecording(CallbackFunctions::listenForSingleNote, myProgramData);
 
@@ -79,7 +72,7 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
         //this way of sleeping may cause an extra buffer or two to be run. Hopefully not an issue
         //if I save magnitudeHistory correctly (that is, disallow extra buffers to be added) things will be fine probably
         while(myProgramData -> stillRecording) {
-            Pa_Sleep(100);
+            Pa_Sleep(50);   //lowered millis I sleep for
         }
 
         AudioFinder::pausePortAudio();
@@ -88,12 +81,14 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
         //if the note is good enough, save the file and move on, otherwise try again
         //add a skip note option for the options given in the beginning in case not ready
 
-        //save file around here (and let user know the file was saved successfully
+        //save file around here (and let user know the file was saved successfully)
+
 
         nextNote++;
         onVolume -= 2;//change these
 
-        //check if the next note has been saved, or maybe that is already done above so there is no need. IDRK.
+        //check if the next note has been saved, or maybe that is already done above so there is no need. IDRK
+
     }
 
 
@@ -111,7 +106,8 @@ void NoteFileHandler::recordNotesAndSaveInFileProgram() {
 }
 
 void NoteFileHandler::initializeMyProgramData() {
-    myProgramData = new noteProgramData{1,  //set to 1 so the first volume read is not interpreted as a major increase
+    //TODO: may be wrong since allocated to the stack (potentially) instead of the heap
+    myProgramData = new NoteProgramData{1,  //set to 1 so the first volume read is not interpreted as a major increase
         SpectroHandler::spectrogramData, //this will always be the global var. Should it have been a global var? no
     true};  //it is true that it is still recording
 }
@@ -174,7 +170,7 @@ AudioSettings NoteFileHandler::getAudioSettings(FILE *fptr) {
     char buffer[20];
     fgets(buffer, 20, fptr);    //skip the first line which contains irrelevant information
 
-    constexpr AudioSettings ret = {};
+    constexpr AudioSettings ret = {};   //another possible struct error here
 
     fscanf(fptr, "%d", &ret.spectroWidth);
     fscanf(fptr, "%d", &ret.spectroFirstIndex);
