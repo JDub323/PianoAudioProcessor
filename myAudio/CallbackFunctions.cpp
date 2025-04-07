@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "AudioFinder.h"
+#include "../noteLogic/NoteFileHandler.h"
 #include "../noteLogic/PianoLogic.h"
 #include "../noteLogic/SpectroHandler.h"
 
@@ -266,9 +267,42 @@ int CallbackFunctions::noDisplayPlayQueuedAudio(const void *inputBuffer, void *o
 
 int CallbackFunctions::listenForSingleNote(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
     //cast the inputbuffer, outputbuffer, and userdata to proper values
-    NoteProgramData
-    //wait for a note to be played
+    auto* programData = (NoteProgramData *)userData;
+    auto* in = (float*) inputBuffer;
+    (void)outputBuffer;
+
+    //copy all values of input buffer to the programdata
+    for (int i = 0; i < framesPerBuffer; i++) {
+        programData->spectroData->in[i] = in[i * NUM_CHANNELS];    //this is probably bad practice lolol
+    }
+
+    fftw_execute(programData->spectroData->p);  //sets output buffer to output of the fft
+
+    constexpr float minVol = .002;
+
+    double volume = 0;
+    //if the note has not been played yet, see if this is the first frame the note has been played
+    if (programData -> stillRecording) {
+        const int lastIndex = programData -> spectroData -> spectrogramSize + programData -> spectroData -> startIndex;
+        for (int i = programData -> spectroData -> startIndex; i < lastIndex; i++) {//BAD PRACTICE:
+            programData->spectroData->in[i] = SpectroHandler::getMagnitudeAt(i);//put the magnitudes over the input array buffer
+        }
+
+        //if the note has been played, see if it is still on
+        volume = PianoLogic::getVolume(programData -> spectroData -> in, programData -> spectroData -> spectrogramSize);
+        if (programData -> previousVolume > minVol && volume < minVol) { //if the previous frame was above the minimum volume and this one was below
+            programData -> stillRecording = false;
+        }
+        else if (volume > minVol) {
+
+        }
+    }
 
     //save note
+    if (volume > minVol) {
+
+    }
+
+    programData -> previousVolume = volume;
 }
 
