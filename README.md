@@ -28,6 +28,7 @@ The **frontend** of the application is built using **Flutter** to enable cross-p
 
 - **C++** — Core backend development
 - **PortAudio**  — Audio capture
+- **FFTW3** — Take STFT
 - **Flutter** — Frontend mobile application (separate repository)
 
 ## Future Plans
