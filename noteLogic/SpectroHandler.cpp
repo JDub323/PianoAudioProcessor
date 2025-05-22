@@ -179,7 +179,7 @@ void SpectroHandler::deallocateFileData() {
  * This function saves the current spectrogramData -> out to the spectrogramMagnitudeHistory for the length
  * of one buffer, automatically converting it to a byte.
  * */
-void SpectroHandler::saveSpectroData() {
+void SpectroHandler::saveSpectroDataToMagnitudeHistory() {
     const int lastIndex = spectrogramData -> spectrogramSize + spectrogramData -> startIndex;
     for (int i = spectrogramData -> startIndex; i < lastIndex; i++) {
         if (currentMagnitudeIndex >= TOTAL_SAMPLES) break; //leave the loop if an index out of bounds error would occur
@@ -187,8 +187,17 @@ void SpectroHandler::saveSpectroData() {
         spectrogramMagnitudeHistory[currentMagnitudeIndex] = shortenDoubleToByte(getMagnitudeAt(i));
         currentMagnitudeIndex++;
     }
+}
 
+//overloaded function
+void SpectroHandler::saveSpectroDataToMagnitudeHistory(const streamCallbackData * spectrogramData) {
+    const int lastIndex = spectrogramData -> spectrogramSize + spectrogramData -> startIndex;
+    for (int i = spectrogramData -> startIndex; i < lastIndex; i++) {
+        if (currentMagnitudeIndex >= TOTAL_SAMPLES) break; //leave the loop if an index out of bounds error would occur
 
+        spectrogramMagnitudeHistory[currentMagnitudeIndex] = shortenDoubleToByte(getMagnitudeAt(i));
+        currentMagnitudeIndex++;
+    }
 }
 
 /*
@@ -198,6 +207,20 @@ void SpectroHandler::saveSpectroData() {
  * (you guessed it) greater amplitude if the index is high :P
  */
 double SpectroHandler::getMagnitudeAt(const int index) {//TODO: add a bool to scale up for image processing/avoid aliasing
+    const double *complex = spectrogramData->out[index];
+
+    double indexMultiplier = 1;
+
+    if constexpr (AMPLIFY_HIGH_FREQUENCIES) {
+        constexpr double maxScaleBy = 20;
+        const double slope = (maxScaleBy - 1)/(SPECTROGRAM_SIZE - 1);
+        indexMultiplier = slope * (index - 1) + 1;
+    }
+
+    return std::hypot(complex[0],complex[1]) * SCALING_FACTOR * indexMultiplier / FRAMES_PER_BUFFER;
+}
+
+double SpectroHandler::getMagnitudeAt(streamCallbackData * spectrogramData, const int index) {//TODO: add a bool to scale up for image processing/avoid aliasing
     const double *complex = spectrogramData->out[index];
 
     double indexMultiplier = 1;

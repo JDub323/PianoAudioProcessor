@@ -221,7 +221,7 @@ void testSpectroSaver(const bool saveOnlyPianoKeys) {
     //AudioFinder::startRecording(CallbackFunctions::noDisplaySaveMagnitudeHistory, SpectroHandler::spectrogramData);
 
     for (int i = 0; i < 100; i++) {
-        SpectroHandler::saveSpectroData();
+        SpectroHandler::saveSpectroDataToMagnitudeHistory();
     }
 
     //Pa_Sleep(RECORDING_TIME * 1000);
@@ -274,7 +274,7 @@ void setTimeSpeakerTest(PaCallbackFunction function) {
 }
 
 int main() {
-    printAllMicOptions();
+    //printAllMicOptions();
     variableTimeTerminalDisplayTest(CallbackFunctions::displayTopFiveDetectedNotes);
     //setTimeTerminalDisplayTest(CallbackFunctions::frequencyDomainAmplitudeDisplay);
     //bucketCrossoverTest();

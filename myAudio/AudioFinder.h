@@ -10,7 +10,7 @@
 #define SHOW_NUM_DEVICES false
 #define SAMPLE_RATE currentDevice.sampleRate
 #define FRAMES_PER_BUFFER 4096
-#define SCALING_FACTOR 2    //keep this low when analyzing audio to avoid aliasing, but this can stay high when looking at images, as a rule, 10-30+ for images, and 1-3 for saving them
+#define SCALING_FACTOR 40    //keep this low when analyzing audio to avoid aliasing, but this can stay high when looking at images, as a rule, 10-30+ for images, and 1-3 for saving them
 #define NUM_CHANNELS currentDevice.numChannels
 #define START_FREQUENCY 20
 #define END_FREQUENCY 20000
@@ -22,6 +22,8 @@
 
 #include "../noteLogic/SpectroHandler.h"
 
+//struct contains which device which is being played, the sampling rate, and the number of channels. This is used
+//to quickly switch between devices. If not using my computer, see below comments
 typedef struct {
     int deviceNum;
     double sampleRate;
@@ -48,16 +50,20 @@ static constexpr deviceSettings laptopInSpeakerWithSecondMonitor = {27, 48000.0,
 //(much empty)
 
 //CURRENT DEVICE
-static constexpr deviceSettings currentDevice = laptopInSpeaker;
+static constexpr deviceSettings currentDevice = laptopMic;
 
 
-//TODO: add comments
+//these are all the parameters needed for a portaudio callback function. These functions are called every
+//SAMPLES_PER_SECOND/FRAMES_PER_BUFFER, and need to
 typedef int (PaCallbackFunction)(const void* inputBuffer, void* outputBuffer,
                                  unsigned long framesPerBuffer,
                                  const PaStreamCallbackTimeInfo* timeInfo,
                                  PaStreamCallbackFlags statusFlags,
                                  void* userData);
 
+
+//these are the audio settings saved in files when saving files. Saving this info lets one ensure invalid files are not
+//played (ie: if the samples per buffer does not match what was saved and there would be large distortions)
 typedef struct {
     const double samplesPerSecond;
     const int samplesPerBuffer;
@@ -65,6 +71,8 @@ typedef struct {
     const int spectroFirstIndex;
 } AudioSettings;
 
+//the current settings my program is using. Used to check if the current settings match what settings were saved in the
+//file saved last time
 static AudioSettings currentSettings = {SAMPLE_RATE, FRAMES_PER_BUFFER,
     SpectroHandler::SPECTROGRAM_SIZE, static_cast<int>(std::ceil(FRAMES_PER_BUFFER / SAMPLE_RATE * START_FREQUENCY))};
 

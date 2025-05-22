@@ -233,7 +233,7 @@ int CallbackFunctions::noDisplaySaveMagnitudeHistory(const void *inputBuffer, vo
 
     fftw_execute(callbackData->p);
 
-    SpectroHandler::saveSpectroData();
+    SpectroHandler::saveSpectroDataToMagnitudeHistory();
 
     return 0;
 }

@@ -58,8 +58,11 @@ public:
     //the equivalent of spectrogramData, but for audio output
     static streamPlaybackData* playbackData;
 
+    //the size of the spectrogram, as calculated by the macro
     const static int SPECTROGRAM_SIZE;
+    //the total number of samples, as calculated by the macro
     const static int TOTAL_SAMPLES;
+    //the total number of samples taken (the height of a spectrogram image)
     const static int TIMES_SAMPLED;
 
     //contains data for every magnitude for every frequency bucket for every measurement in time. Uses a 1d array
@@ -78,16 +81,29 @@ public:
     static void deallocateSpectrogramData();
     static void deallocateMagnitudeHistoryMemory();
 
+    //functions for saving audio input
+    //initializeSpectrogramData(); (use the one above)
+    static void allocateFFTHistoryMemory();//TODO fxn
+    //deallocateSpectrogramData();
+    static void deallocateFFTHistoryMemory();//TODO fxn
+
     //functions for audio output
     static void initializeStreamPlaybackData();
     static void initializeFileData(char* fileName);//include checks to make sure the saved format is the same as the current format
     static void deallocateStreamPlaybackData();
     static void deallocateFileData();
 
-    static void saveSpectroData();
-    static void getNextSpectrogram();//TODO
+    //functions to save Spectro Data to Magnitude History
+    static void saveSpectroDataToMagnitudeHistory();
+    static void saveSpectroDataToMagnitudeHistory(const streamCallbackData * spectrogramData);
+    static void getNextSpectrogram();//TODO (IDK what I wanted this one to do :/ )
+
+    //functions to save spectro data to fftHistory
+    static void saveSpectroDataToFFTHistory();
+
 
     static double getMagnitudeAt(int index);
+    static double getMagnitudeAt(streamCallbackData * spectrogramData, int index);
     static uint8_t shortenDoubleToByte(double in); //I am considering making this into a short, doubling the precision to a 16 bit standard
 
     static double convertToFrequency(int index);
